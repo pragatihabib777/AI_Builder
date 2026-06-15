@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resume Generator</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#4facfe,#00f2fe);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    background:white;
+    width:600px;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+    color:#333;
+}
+
+.form-group{
+    margin-bottom:15px;
+}
+
+label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:bold;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+}
+
+textarea{
+    resize:vertical;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    background:#007bff;
+    color:white;
+    font-size:18px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+.resume-box{
+    margin-top:20px;
+    background:#f8f9fa;
+    padding:15px;
+    border-radius:8px;
+    white-space:pre-wrap;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Resume Generator</h1>
+
+    <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="name">
+    </div>
+
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email">
+    </div>
+
+    <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="phone">
+    </div>
+
+    <div class="form-group">
+        <label>Skills (comma separated)</label>
+        <input type="text" id="skills">
+    </div>
+
+    <div class="form-group">
+        <label>Education</label>
+        <textarea id="education" rows="3"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Experience</label>
+        <textarea id="experience" rows="3"></textarea>
+    </div>
+
+    <button onclick="generateResume()">Generate Resume</button>
+
+    <div class="resume-box">
+        <h3>Generated Resume</h3>
+        <div id="result"></div>
+    </div>
+</div>
+
+<script>
+async function generateResume() {
+
+    const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        skills: document.getElementById("skills").value
+                    .split(",")
+                    .map(skill => skill.trim()),
+        education: document.getElementById("education").value,
+        experience: document.getElementById("experience").value
+    };
+
+    try {
+        const response = await fetch(
+            "http://127.0.0.1:8000/generate-resume",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }
+        );
+
+        const result = await response.json();
+
+        document.getElementById("result").innerText =
+            result.resume || JSON.stringify(result, null, 2);
+
+    } catch(error) {
+        document.getElementById("result").innerText =
+            "Error connecting to API";
+        console.error(error);
+    }
+}
+</script>
+
+</body>
+</html>
